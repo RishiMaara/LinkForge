@@ -31,6 +31,7 @@ export default function LinkTable({ links }: Props) {
   }
 
   async function handleDelete(id: string) {
+    if (!confirm("Are you sure you want to delete this link? This cannot be undone.")) return;
     setPendingId(id);
     try {
       const fd = new FormData();
@@ -132,7 +133,7 @@ export default function LinkTable({ links }: Props) {
           <Dialog.Overlay className="fixed inset-0 bg-black/40 z-50" />
           <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm z-50 focus:outline-none">
             <Dialog.Title className="sr-only">QR Code</Dialog.Title>
-            {qrSlug && (
+            {qrSlug && typeof window !== "undefined" && (
               <QRCard url={`${window.location.origin}/${qrSlug}`} />
             )}
           </Dialog.Content>

@@ -39,7 +39,7 @@ function query(table: Table) {
 
 export const mockDb = {
   from: (table: Table) => ({
-    select: () => query(table),
+    select: (_fields?: string) => query(table),
     insert: async (values: any) => {
       const record = {
         id: crypto.randomUUID(),

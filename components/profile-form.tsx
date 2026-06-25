@@ -2,6 +2,7 @@
 import { createClient } from "@/lib/supabase/client";
 import { useState, useEffect } from "react";
 import { createProfile } from "@/actions/profile";
+import { toast } from "sonner";
 
 export default function ProfileForm() {
   const supabase = createClient();
@@ -9,7 +10,7 @@ export default function ProfileForm() {
   const [displayName, setDisplayName] = useState("");
   const [headline, setHeadline] = useState("");
   const [bio, setBio] = useState("");
-  const [saveStatus, setSaveStatus] = useState<"idle" | "saved" | "error">("idle");
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -31,7 +32,7 @@ export default function ProfileForm() {
   }, []);
 
   async function saveProfile() {
-    setSaveStatus("idle");
+    setSaving(true);
     const formData = new FormData();
     formData.set("username", username);
     formData.set("display_name", displayName);
@@ -39,9 +40,11 @@ export default function ProfileForm() {
     formData.set("bio", bio);
     try {
       await createProfile(formData);
-      setSaveStatus("saved");
-    } catch {
-      setSaveStatus("error");
+      toast.success("Profile saved successfully!");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to save profile. Please try again.");
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -50,28 +53,29 @@ export default function ProfileForm() {
       <div className="space-y-3">
         <div>
           <label className="text-xs font-bold uppercase tracking-wider text-neutral-500">Username</label>
-          <input className="w-full border rounded-xl px-4 py-2.5 text-sm mt-1" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="your-username" />
+          <input className="w-full border rounded-xl px-4 py-2.5 text-sm mt-1 focus:outline-none focus:border-black" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="your-username" />
         </div>
         <div>
           <label className="text-xs font-bold uppercase tracking-wider text-neutral-500">Display Name</label>
-          <input className="w-full border rounded-xl px-4 py-2.5 text-sm mt-1" value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="Your Name" />
+          <input className="w-full border rounded-xl px-4 py-2.5 text-sm mt-1 focus:outline-none focus:border-black" value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="Your Name" />
         </div>
         <div>
           <label className="text-xs font-bold uppercase tracking-wider text-neutral-500">Headline</label>
-          <input className="w-full border rounded-xl px-4 py-2.5 text-sm mt-1" value={headline} onChange={(e) => setHeadline(e.target.value)} placeholder="Software Engineer" />
+          <input className="w-full border rounded-xl px-4 py-2.5 text-sm mt-1 focus:outline-none focus:border-black" value={headline} onChange={(e) => setHeadline(e.target.value)} placeholder="Software Engineer" />
         </div>
         <div>
           <label className="text-xs font-bold uppercase tracking-wider text-neutral-500">Bio</label>
-          <textarea className="w-full border rounded-xl px-4 py-2.5 text-sm mt-1 min-h-[80px]" value={bio} onChange={(e) => setBio(e.target.value)} placeholder="Tell your story..." />
+          <textarea className="w-full border rounded-xl px-4 py-2.5 text-sm mt-1 min-h-[80px] focus:outline-none focus:border-black" value={bio} onChange={(e) => setBio(e.target.value)} placeholder="Tell your story..." />
         </div>
       </div>
-      <button type="button" onClick={saveProfile} className="rounded-xl bg-black text-white px-6 py-2.5 text-sm font-bold hover:bg-neutral-800 transition cursor-pointer">Save Profile</button>
-      {saveStatus === "saved" && (
-        <p className="text-sm text-emerald-600 font-medium">Profile saved successfully!</p>
-      )}
-      {saveStatus === "error" && (
-        <p className="text-sm text-red-600 font-medium">Failed to save profile. Please try again.</p>
-      )}
+      <button
+        type="button"
+        onClick={saveProfile}
+        disabled={saving}
+        className="rounded-xl bg-black text-white px-6 py-2.5 text-sm font-bold hover:bg-neutral-800 transition cursor-pointer disabled:opacity-50"
+      >
+        {saving ? "Saving..." : "Save Profile"}
+      </button>
     </div>
   );
 }
