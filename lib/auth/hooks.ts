@@ -8,7 +8,7 @@ export function useSession() {
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }: any) => {
       setData({ session, user: session?.user });
       setStatus(session ? "authenticated" : "unauthenticated");
     });

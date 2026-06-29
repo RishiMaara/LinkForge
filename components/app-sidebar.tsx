@@ -66,7 +66,7 @@ export function AppSidebar({ user }: { user: any }) {
 
       <div className="mt-auto flex flex-col gap-4 border-t pt-4">
         <div className="flex items-center gap-3 px-2">
-          <Avatar user={{ name: user?.email, image: undefined }} />
+          <Avatar identifier={user?.email || "User"} className="h-9 w-9" />
           <div className="flex flex-col overflow-hidden">
             <span className="truncate text-sm font-medium text-neutral-900">
               {user?.email}
